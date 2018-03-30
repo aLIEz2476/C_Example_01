@@ -22,7 +22,7 @@ SNode* InsertNodeData(SNode* pStart, int data, int insert); //해당 데이터를 가진
 void DeleteNodeData(SNode* pStart, int del); //해당데이터를 가진 노드를 삭제한다.
 void PrintLinkedList(SNode* pStart); //노드를 순회하며 끝날때까지 출력한다.
 void DeleteLinkedList(SNode* pStart); //노드를 순회하며 모든데이터를 삭제한다.
-void ReverceLinkedList(SNode* pStart); //
+void ReverseLinkedList(SNode* pStart); //
 
 									   //연결리스트 동적으로 입력받기.(동적할당 설명용)
 void InputAdd();
@@ -31,7 +31,7 @@ void InputAdd();
 //이 소스에 몇가지 버그가 존재한다.
 //이 코드가 정상작동 된 후 발견해볼것!
 //main()함수 내 코드는 절대 코드 변경하지말것.
-void main()
+int main()
 {
 	//_CrtSetBreakAlloc(71); //메모리 누수시 번호를 넣으면 할당하는 위치에 브레이크 포인트를 건다.
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); //메모리 누수 검사 
@@ -42,6 +42,7 @@ void main()
 	//노드 추가 테스트
 	pEnd = CreateNode(pEnd, 10);
 	pBegin = pEnd; //마지막 노드를 알아야 검색이 가능하므로 저장해둔다.
+	// 반환된 노드를 시작값에 저장
 
 	pEnd = CreateNode(pEnd, 20);
 	pEnd = CreateNode(pEnd, 30);
@@ -68,12 +69,12 @@ void main()
 //기존코드는 손대지말고, 현 프로그램 정상 작동하도록할것.
 SNode* CreateNode(SNode* pNode, int data)
 {
-	SNode* pTemp = NULL;
-
-	pTemp = new SNode();
+	SNode* pTemp=NULL;
+	
+	pTemp = new SNode(); // 임시 노드 동적할당으로 생성
 	pTemp->nData = data;
-
-	return  pTemp;
+	
+	return  pTemp; // 노드 반환
 }
 
 SNode* FindNodeData(SNode* pStart, int data)
