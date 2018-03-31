@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h> //메모리 동적할당 헤더
 #include <crtdbg.h> //메모리 누수 탐지 헤더
+
 //#include  "linkedlistClass.h"
 
 struct SNode {
@@ -38,6 +39,7 @@ int main()
 
 	SNode* pBegin = NULL;
 	SNode* pEnd = NULL;
+	//pBegin : head, pEnd : tail
 
 	//노드 추가 테스트
 	pEnd = CreateNode(pEnd, 10);
@@ -51,16 +53,16 @@ int main()
 
 	PrintLinkedList(pBegin);
 
-	SNode* pFind = FindNodeData(pBegin, 40);
+	SNode* pFind = FindNodeData(pBegin, 30);
 	printf("Find:%d\n", pFind->nData);
 
-	pEnd = InsertNodeData(pBegin, 30, 60);//노드 삽입
+	//pEnd = InsertNodeData(pBegin, 30, 60);//노드 삽입
 
-	PrintLinkedList(pBegin);
+	//PrintLinkedList(pBegin);
 
-	DeleteNodeData(pBegin, 60);//노드 삭제
+	//DeleteNodeData(pBegin, 60);//노드 삭제
 
-	PrintLinkedList(pBegin);
+	//PrintLinkedList(pBegin);
 
 	DeleteLinkedList(pBegin); //모든노드삭제 - 이 함수를 호출하지않을시 메모리가 누수됨.
 }
@@ -69,18 +71,38 @@ int main()
 //기존코드는 손대지말고, 현 프로그램 정상 작동하도록할것.
 SNode* CreateNode(SNode* pNode, int data)
 {
-	SNode* pTemp=NULL;
-	
+	SNode* pTemp;
+
 	pTemp = new SNode(); // 임시 노드 동적할당으로 생성
-	pTemp->nData = data;
 	
-	return  pTemp; // 노드 반환
+	pTemp->nData = data;
+	if (pNode != NULL)
+	{
+		pNode->pNext = pTemp;
+	}
+	// pNode가 NULL이 아닐 때, 즉 pNode 내부에 내용물이 있을 때
+	// pNode(이전 노드의 주소)의 pNext(다음 노드 좌표)에게 pTemp(다음 노드의 주소)를 전달
+		
+	else
+	{
+		pTemp->pNext = pTemp;
+	}
+	// pNode가 NULL일 때, 즉 pNode 내용물이 없을 때
+	// pTemp의 pNext에게 자신의 주소를 전달
+		
+	
+	return pTemp; // 노드 반환
+
 }
 
 SNode* FindNodeData(SNode* pStart, int data)
 {
 	SNode* pNode = pStart;
-
+	while (pNode->pNext != NULL)
+	{
+		if (pNode->nData == data) return pNode;
+		else pNode = pNode->pNext;
+	}
 	return pNode;
 }
 
@@ -152,3 +174,4 @@ void InputAdd()
 
 	DeleteLinkedList(pStart); //모든노드삭제 - 이 함수를 호출하지않을시 메모리가 누수됨.
 }
+
