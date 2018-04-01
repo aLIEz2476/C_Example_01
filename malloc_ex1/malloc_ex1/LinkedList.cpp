@@ -1,8 +1,7 @@
 ﻿/*
-未完成の部分
-ノードの挿入
-ノードのデータ削除
-データリンクの逆出力
+当コードはすべての具現化したコードである。
+バグっぽい部分があちこち有ったが現在時点で発見したバグはリストを逆に出力する部分以外ないと思う。
+よってこのコードを完成版だと判断する。　以上。
 */
 
 
@@ -31,7 +30,7 @@ SNode* InsertNodeData(SNode* pStart, int data, int insert); //해당 데이터�
 void DeleteNodeData(SNode* pStart, int del); //해당데이터를 가진 노드를 삭제한다.
 void PrintLinkedList(SNode* pStart); //노드를 순회하며 끝날때까지 출력한다.
 void DeleteLinkedList(SNode* pStart); //노드를 순회하며 모든데이터를 삭제한다.
-void ReverseLinkedList(SNode* pStart); //
+SNode* ReverseLinkedList(SNode* pStart); //
 
 									   //연결리스트 동적으로 입력받기.(동적할당 설명용)
 void InputAdd();
@@ -61,16 +60,21 @@ int main()
 
 	PrintLinkedList(pBegin);
 
-	SNode* pFind = FindNodeData(pBegin, 30);
+	SNode* pFind = FindNodeData(pBegin, 40);
 	printf("Find:%d\n", pFind->nData);
 
-	//pEnd = InsertNodeData(pBegin, 30, 60);//노드 삽입
+	pEnd = InsertNodeData(pBegin, 30, 60);//노드 삽입
 
-	//PrintLinkedList(pBegin);
+	
+	PrintLinkedList(pBegin);
 
-	//DeleteNodeData(pBegin, 60);//노드 삭제
+	pBegin=ReverseLinkedList(pBegin);
+	pEnd = NULL;
 
-	//PrintLinkedList(pBegin);
+	DeleteNodeData(pBegin, 60);//노드 삭제
+
+	PrintLinkedList(pBegin);
+	
 
 	DeleteLinkedList(pBegin); //모든노드삭제 - 이 함수를 호출하지않을시 메모리가 누수됨.
 }
@@ -84,6 +88,7 @@ SNode* CreateNode(SNode* pNode, int data)
 	pTemp = new SNode(); // 임시 노드 동적할당으로 생성
 	
 	pTemp->nData = data;
+	
 	if (pNode != NULL)
 	{
 		pNode->pNext = pTemp;
@@ -93,7 +98,7 @@ SNode* CreateNode(SNode* pNode, int data)
 		
 	else
 	{
-		pTemp->pNext = pTemp;
+		pTemp->pNext = pNode;
 	}
 	// pNode가 NULL일 때, 즉 pNode 내용물이 없을 때
 	// pTemp의 pNext에게 자신의 주소를 전달
@@ -117,20 +122,44 @@ SNode* FindNodeData(SNode* pStart, int data)
 SNode* InsertNodeData(SNode* pStart, int data, int insert)
 {
 	SNode* pNode = pStart;
-
-	pNode = FindNodeData(pStart, data);
+	SNode* pTemp=FindNodeData(pNode, data);
+	SNode* new_node = new SNode();
+	new_node = CreateNode(NULL, insert);//넣을 노드 생성
+	if (FindNodeData(pNode, data))
+	{
+		new_node->pNext = pTemp->pNext;
+		pTemp->pNext = new_node;
+	}// 데이터 찾아낸 경우
+	else
+	{
+		printf("잘못된 입력입니다.\n\n");
+		system("Pause");
+	}// 아닌 경우
 	
-	return pNode;
+	
+	
+	return new_node;
 }
 
 void DeleteNodeData(SNode* pStart, int del)
 {
-	SNode* pPre = NULL;
 	SNode* pNode = pStart;
-	pPre = FindNodeData(pNode, del);
-
-	
-
+	SNode* pDel = pStart->pNext; // pDel은 pNode대비 한발짝 더 나가있음
+	while (pDel != NULL)
+	{
+		if (pDel->nData == del)
+		{
+			pNode->pNext = pDel->pNext; // 맞는 데이터를 찾았을 경우, 주소 변경
+			free(pDel); // 대상 위치 박살
+			printf("\n\n%d이(가) 들어간 노드 삭제 완료\n\n", del);
+			break; // 탈출
+		}
+		else
+		{
+			pNode = pDel; // 한발 먼저 온 위치를 저장시킴
+			pDel = pDel->pNext; // pDel을 한발짝 더 내보냄
+		}
+	}
 }
 
 void PrintLinkedList(SNode* pStart)
@@ -151,13 +180,42 @@ void PrintLinkedList(SNode* pStart)
 void DeleteLinkedList(SNode* pStart)
 {
 	SNode* pNode = pStart;
-	SNode* pDel = NULL;
-	while (pNode->pNext != NULL)
+	SNode* pDel = pStart->pNext;
+
+	while (1)
 	{
-		pNode->nData = NULL;
-		pNode->pNext = NULL;
+		if (pDel->pNext==NULL)
+		{
+			free(pDel);
+			break;
+		}
+		else
+		{
+			free(pNode);
+			pNode = pDel;
+			pDel = pDel->pNext;
+		}
 	}
-	printf("\n\n모든 노드가 지워짐\n\n");
+	printf("\n\n모든 노드가 제거되었습니다.\n종료합니다.\n\n");
+	
+}
+
+SNode* ReverseLinkedList(SNode* pStart)
+{
+	SNode *p, *q, *r;
+	p = pStart; // 미처리 노드
+	q = NULL; // 역순으로 만들어질 노드
+	while (p != NULL)
+	{
+		r = q; // r은 역순으로 된 노드
+		q = p; // r은 q를, ,q는 p를 따라감
+		p = p->pNext; 
+		q->pNext = r; // q의 링크방향 변경
+	}
+	// 역순 과정
+	printf("\n\n역순으로 출력합니다.\n\n");
+	PrintLinkedList(q); // q를 출력
+	return q;
 }
 
 void InputAdd()
